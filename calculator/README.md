@@ -34,4 +34,20 @@ Therefore _Servlets_ examples are placed here, too.
 
 # Development
 
-See `servlet` package.
+## Average Servlet
+
+http://localhost:8080/calculator/average?grades=2&grades=7
+
+- Calculates the average of the _incoming_ grades.
+
+- Includes also a basic error handling and 400 status code
+
+## ThradSafeFailureServlet
+
+http://localhost:8080/calculator/thread
+
+- demostrate how to misuse class member variables
+- A servlet is not thread safe.
+- It initalized (and destroyed) by the container. There could be one instance or more of the servlet.
+- The `GET` (or all other HTTP methods) are `served` by the same servlet.
+- Member variables are shared between requests
