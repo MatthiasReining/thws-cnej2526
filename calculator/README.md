@@ -36,7 +36,7 @@ Therefore _Servlets_ examples are placed here, too.
 
 ## Average Servlet
 
-http://localhost:8080/calculator/average?grades=2&grades=7
+    http://localhost:8080/calculator/average?grades=2&grades=7
 
 - Calculates the average of the _incoming_ grades.
 
@@ -44,7 +44,7 @@ http://localhost:8080/calculator/average?grades=2&grades=7
 
 ## ThradSafeFailureServlet
 
-http://localhost:8080/calculator/thread
+    http://localhost:8080/calculator/thread
 
 - demostrate how to misuse class member variables
 - A servlet is not thread safe.
@@ -58,15 +58,24 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types/Common_types
 
 - POST as JSON
 
-  > curl -X POST -d "{\"grades\": [3,4.5]}" -H "Content-Type: application/json" http://localhost:8080/calculator/average
+      curl -X POST -d "{\"grades\": [3,4.5]}" -H "Content-Type: application/json" http://localhost:8080/calculator/average
 
 - POST with our properitary format 'application/thws"
-  > curl -X POST -d "3,4.5" -H "Content-Type: application/thws" http://localhost:8080/calculator/average
-  > average (THWS format):3.75
+
+      curl -X POST -d "3,4.5" -H "Content-Type: application/thws" http://localhost:8080/calculator/average
+
+      > average (THWS format):3.75
 
 Use Accept
 
-> C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: application/json" http://localhost:8080/calculator/average
-> {"average": 3.75}
-> C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: text/plain" http://localhost:8080/calculator/average
-> average: 3.75
+    C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: application/json" http://localhost:8080/calculator/average
+    {"average": 3.75}
+    C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: text/plain" http://localhost:8080/calculator/average
+    average: 3.75
+
+## Web Filter
+
+We only allow "Google Chrome" (for testing)
+
+See `ChromFilter.java`  
+For testing for all resources change `@WebFilter("/bloker*")` to `@WebFilter("/*")`
