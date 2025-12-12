@@ -79,3 +79,11 @@ We only allow "Google Chrome" (for testing)
 
 See `ChromFilter.java`  
 For testing for all resources change `@WebFilter("/bloker*")` to `@WebFilter("/*")`
+
+## Redirect Servlet
+
+http://localhost:8080/calculator/redirect-example
+
+## Forward servlet
+
+http://localhost:8080/calculator/forward-example
