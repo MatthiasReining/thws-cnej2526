@@ -13,8 +13,6 @@ public class ForwardExample extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO is not used - Why?
-        resp.getWriter().write("HEADER LINE");
 
         req.getRequestDispatcher("/average?grades=2&grades=4").forward(req, resp);
     }

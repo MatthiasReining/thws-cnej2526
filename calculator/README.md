@@ -87,3 +87,9 @@ http://localhost:8080/calculator/redirect-example
 ## Forward servlet
 
 http://localhost:8080/calculator/forward-example
+
+## Include sevlet
+
+for server side includes
+
+http://localhost:8080/calculator/ssi-example
