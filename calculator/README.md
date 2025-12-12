@@ -51,3 +51,22 @@ http://localhost:8080/calculator/thread
 - It initalized (and destroyed) by the container. There could be one instance or more of the servlet.
 - The `GET` (or all other HTTP methods) are `served` by the same servlet.
 - Member variables are shared between requests
+
+## Average Sevlet with different Content-Types
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types/Common_types
+
+- POST as JSON
+
+  > curl -X POST -d "{\"grades\": [3,4.5]}" -H "Content-Type: application/json" http://localhost:8080/calculator/average
+
+- POST with our properitary format 'application/thws"
+  > curl -X POST -d "3,4.5" -H "Content-Type: application/thws" http://localhost:8080/calculator/average
+  > average (THWS format):3.75
+
+Use Accept
+
+> C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: application/json" http://localhost:8080/calculator/average
+> {"average": 3.75}
+> C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: text/plain" http://localhost:8080/calculator/average
+> average: 3.75
