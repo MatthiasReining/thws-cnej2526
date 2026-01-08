@@ -23,6 +23,8 @@ see README-Quarkus.md AND Dockerfile.jvm
 
 see README-Quarkus.md AND Dockerfile.native
 
+On Windows, best using WSL2 with installed GraalVM on WSL
+
     ./mvnw package -Dnative
     docker build -f src/main/docker/Dockerfile.native -t thws/students-native .
     docker run -i --rm -p 8080:8080 thws/students-native

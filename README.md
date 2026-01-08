@@ -14,6 +14,10 @@ The students app is a **Quarkus** app developed via the Jakarta EE API.
 
 see [/students/README.md/](/students/README.md/)
 
-## Serverless
+## Hetzner Cloud
+
+see [/students/README-hetzner-cloud.md/](/students/README-hetzner-cloud.md/)
+
+## AWS Lambda - Serverless
 
 see [/students/README-aws-lambda.md/](/students/README-aws-lambda.md/)
