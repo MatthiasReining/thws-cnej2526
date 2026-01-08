@@ -12,25 +12,26 @@ Therefore _Servlets_ examples are placed here, too.
 ## Server Wildfly 38.0.1.Final
 
 - Download from https://www.wildfly.org/downloads/
-- Extracted to ../srv/wildfly-38.0.1.Final
+- Extracted to `../srv/wildfly-38.0.1.Final`
 
 - Adapt `pom.xml` with `<jbossHome>${project.basedir}/../../srv/wildfly-38.0.1.Final</jbossHome>`
 
 ## Run
 
-- Start server
+- Start server  
+  `../../srv/bin/standalone.bat`
 
-  > ../../srv/bin/standalone.bat
-
-- Server stop
-
+- Server stop  
   `Ctrl+C`
 
 - Build and deploy  
    Server must be stopped
   _CalculatorApp_
 
-  > mvnw clean compile wildfly:dev
+  `mvnw clean compile wildfly:dev`
+
+HINT:  
+use `mvnw`: _Maven Wrapper_ (`mvnnw` vs `mvn`)
 
 # Development
 
@@ -39,7 +40,6 @@ Therefore _Servlets_ examples are placed here, too.
     http://localhost:8080/calculator/average?grades=2&grades=7
 
 - Calculates the average of the _incoming_ grades.
-
 - Includes also a basic error handling and 400 status code
 
 ## ThradSafeFailureServlet
@@ -58,20 +58,27 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types/Common_types
 
 - POST as JSON
 
-      curl -X POST -d "{\"grades\": [3,4.5]}" -H "Content-Type: application/json" http://localhost:8080/calculator/average
+  ```
+  curl -X POST -d "{\"grades\": [3,4.5]}" -H "Content-Type: application/json" http://localhost:8080/calculator/average
+  ```
 
 - POST with our properitary format 'application/thws"
 
-      curl -X POST -d "3,4.5" -H "Content-Type: application/thws" http://localhost:8080/calculator/average
+  ```
+  curl -X POST -d "3,4.5" -H "Content-Type: application/thws" http://localhost:8080/calculator/average
 
-      > average (THWS format):3.75
+  > average (THWS format):3.75
+  ```
 
-Use Accept
+Use `Accept`
 
-    C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: application/json" http://localhost:8080/calculator/average
-    {"average": 3.75}
-    C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: text/plain" http://localhost:8080/calculator/average
-    average: 3.75
+```
+C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: application/json" http://localhost:8080/calculator/average
+{"average": 3.75}
+
+C:\Users\matthias>curl -X POST -d "3,4.5" -H "Content-Type: application/thws" --header "Accept: text/plain" http://localhost:8080/calculator/average
+average: 3.75
+```
 
 ## Web Filter
 
@@ -93,3 +100,35 @@ http://localhost:8080/calculator/forward-example
 for server side includes
 
 http://localhost:8080/calculator/ssi-example
+
+# Analysis Deployments
+
+Deployment to
+
+- Wildfly
+- Payara Fish
+
+## Payara Fish
+
+` C:\Users\matthias\dev\thws\2025prep\srv\payara7\bin>asadmin start-domain`
+
+- Deployment via UI: http://localhost:4848/common/index.jsf
+- Upload _war_-File
+- See the overwritable settings
+
+https://payara.fish/blog/how-to-deploy-an-application-on-payara-server-or-glassfish/
+
+## App Server Memory Comsumption (Toos: Memory Monitoring)
+
+- Java -> `jConsole` (located in _Java_ / _GraalVM_ folder `<JAVA_HOME>/bin`)
+
+- VisualVM  
+  https://visualvm.github.io/
+  (more fancy...)
+  Also good for analyzing heap dumps, etc.
+
+- Docker Inspect  
+  `docker stats`
+
+- `ctop`  
+  https://github.com/bcicen/ctop
