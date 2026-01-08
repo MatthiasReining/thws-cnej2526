@@ -16,13 +16,13 @@ Start:
 see README-Quarkus.md AND Dockerfile.jvm
 
     ./mvnw package
-    docker build -f src/main/docker/Dockerfile.jvm -t quarkus/students-jvm .
-    docker run -i --rm -p 8080:8080 quarkus/students-jvm
+    docker build -f src/main/docker/Dockerfile.jvm -t thws/students-jvm .
+    docker run -i --rm -p 8080:8080 thws/students-jvm
 
 ### Build Docker.Native
 
 see README-Quarkus.md AND Dockerfile.native
 
     ./mvnw package -Dnative
-    docker build -f src/main/docker/Dockerfile.native -t quarkus/students-native .
-    docker run -i --rm -p 8080:8080 quarkus/students-native
+    docker build -f src/main/docker/Dockerfile.native -t thws/students-native .
+    docker run -i --rm -p 8080:8080 thws/students-native
