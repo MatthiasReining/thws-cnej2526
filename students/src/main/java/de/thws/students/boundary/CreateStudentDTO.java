@@ -6,8 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 
+/**
+ * Data Transfer Object for creating a new Student.
+ */
 public record CreateStudentDTO(
-        @NotBlank(message = "First name is required") String firstName,
+        /** First name of the new student. */
+        @NotBlank String firstName,
 
         @NotBlank(message = "Last name is required") String lastName,
 
