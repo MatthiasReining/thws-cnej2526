@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import de.thws.courses.entity.Course;
+import de.thws.courses.entity.CourseParticipant;
+import de.thws.students.boundary.CourseParticiapantDTO;
 import de.thws.students.entity.Student;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -76,6 +79,22 @@ public class StudentService {
         }
         em.remove(s);
         return true;
+    }
+
+    @Transactional
+    public void addCourseParticipation(Long studentId, CourseParticiapantDTO courseParticiapantDTO) {
+
+        Student student = em.find(Student.class, studentId);
+
+        System.out.println()
+        CourseParticipant cp = new CourseParticipant();
+        Course course = em.find(Course.class, courseParticiapantDTO.courseId());
+
+        cp.course = course;
+        cp.grade = courseParticiapantDTO.grade();
+
+        student.getCourseParticiapant().add(cp);
+
     }
 
 }

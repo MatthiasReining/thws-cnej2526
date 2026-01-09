@@ -1,14 +1,23 @@
 package de.thws.students.boundary;
 
+import java.util.List;
+
 import de.thws.students.control.StudentService;
 import de.thws.students.entity.Student;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import java.util.List;
 
 @Path("/students")
 @Produces(MediaType.APPLICATION_JSON)
@@ -23,6 +32,15 @@ public class StudentsResource {
         return studentService.findAll().stream()
                 .map(this::toDTO)
                 .toList();
+    }
+
+    @POST
+    @Path("/{id}/courses")
+    public void addCourse(@PathParam("id") Long id, @Valid CourseParticiapantDTO courseParticiapantDTO) {
+
+        System.out.println("Adding course participant to student with id: " + id);
+        studentService.addCourseParticipation(id, courseParticiapantDTO);
+
     }
 
     @GET
@@ -42,10 +60,13 @@ public class StudentsResource {
 
     @GET
     @Path("/{id}")
-    public StudentDTO getStudentById(@PathParam("id") Long id) {
+    public Student getStudentById(@PathParam("id") Long id) {
         return studentService.findById(id)
-                .map(this::toDTO)
                 .orElseThrow(() -> new NotFoundException("Student with id " + id + " not found"));
+
+        // .map(this::toDTO)
+        // .orElseThrow(() -> new NotFoundException("Student with id " + id + " not
+        // found"));
     }
 
     // is this endpoint well designed? or better to move as query param in
@@ -104,12 +125,12 @@ public class StudentsResource {
     }
 
     private Student fromUpdateDTO(UpdateStudentDTO dto) {
-        return new Student(
-                null,
-                dto.firstName(),
-                dto.lastName(),
-                dto.email(),
-                dto.matriculationNumber(),
-                dto.enrollmentDate());
+        Student s = new Student();
+        s.setFirstName(dto.firstName());
+        s.setLastName(dto.lastName());
+        s.setEmail(dto.email());
+        s.setMatriculationNumber(dto.matriculationNumber());
+        s.setEnrollmentDate(dto.enrollmentDate());
+        return s;
     }
 }

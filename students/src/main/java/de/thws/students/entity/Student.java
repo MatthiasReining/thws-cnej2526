@@ -1,11 +1,16 @@
 package de.thws.students.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
+import de.thws.courses.entity.CourseParticipant;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Student {
@@ -20,18 +25,9 @@ public class Student {
     private String matriculationNumber;
     private LocalDate enrollmentDate;
 
-    public Student() {
-    }
-
-    public Student(Long id, String firstName, String lastName, String email,
-            String matriculationNumber, LocalDate enrollmentDate) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.matriculationNumber = matriculationNumber;
-        this.enrollmentDate = enrollmentDate;
-    }
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "student_id")
+    private List<CourseParticipant> courseParticiapant;
 
     public Long getId() {
         return id;
@@ -107,4 +103,13 @@ public class Student {
                 ", enrollmentDate=" + enrollmentDate +
                 '}';
     }
+
+    public List<CourseParticipant> getCourseParticiapant() {
+        return courseParticiapant;
+    }
+
+    public void setCourseParticiapant(List<CourseParticipant> courseParticiapant) {
+        this.courseParticiapant = courseParticiapant;
+    }
+
 }
