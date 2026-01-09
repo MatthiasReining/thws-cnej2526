@@ -2,6 +2,9 @@ package de.thws.students.control;
 
 import de.thws.students.entity.Student;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.ValidationException;
+import jakarta.ws.rs.WebApplicationException;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
@@ -46,7 +49,7 @@ public class StudentService {
 
     public Student create(Student student) {
         if (findByMatriculationNumber(student.getMatriculationNumber()).isPresent()) {
-            throw new IllegalArgumentException("Student with matriculation number " +
+            throw new WebApplicationException("Student with matriculation number " +
                     student.getMatriculationNumber() + " already exists");
         }
         Long id = ID_GENERATOR.getAndIncrement();
