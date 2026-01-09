@@ -70,9 +70,8 @@ public class StudentsResource {
     @Path("/{id}")
     public StudentDTO updateStudent(@PathParam("id") Long id, @Valid UpdateStudentDTO updateDTO) {
         Student student = fromUpdateDTO(updateDTO);
-        return studentService.update(id, student)
-                .map(this::toDTO)
-                .orElseThrow(() -> new NotFoundException("Student with id " + id + " not found"));
+        student.setId(id);
+        return this.toDTO(studentService.update(student));
     }
 
     @DELETE

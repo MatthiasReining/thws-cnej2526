@@ -1,11 +1,8 @@
 package de.thws.students.control;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import de.thws.students.entity.Student;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,27 +16,10 @@ public class StudentService {
     @PersistenceContext
     EntityManager em;
 
-    private static final Map<Long, Student> STUDENTS = new ConcurrentHashMap<>();
-
-    static {
-        // Initialize with 5 sample students
-        STUDENTS.put(1L,
-                new Student(1L, "Max", "Mustermann", "max.mustermann@thws.de", "1234567", LocalDate.of(2023, 10, 1)));
-        STUDENTS.put(2L,
-                new Student(2L, "Anna", "Schmidt", "anna.schmidt@thws.de", "2345678", LocalDate.of(2023, 10, 1)));
-        STUDENTS.put(3L,
-                new Student(3L, "Thomas", "Müller", "thomas.mueller@thws.de", "3456789", LocalDate.of(2024, 3, 15)));
-        STUDENTS.put(4L,
-                new Student(4L, "Sarah", "Weber", "sarah.weber@thws.de", "4567890", LocalDate.of(2024, 3, 15)));
-        STUDENTS.put(5L,
-                new Student(5L, "Michael", "Fischer", "michael.fischer@thws.de", "5678901", LocalDate.of(2024, 10, 1)));
-
-    }
-
     public Collection<Student> findAll() {
 
         // JPQL -> SQL "SELECT * FROM Student s" -> JPQL Select s from Student s
-        List<Student> students = em.createQuery("SELECT s FROM Student s", Student.class)
+        List<Student> students = em.createQuery("SELECT x FROM Student x", Student.class)
                 .getResultList();
 
         return students;
@@ -50,9 +30,19 @@ public class StudentService {
     }
 
     public Optional<Student> findByMatriculationNumber(String matriculationNumber) {
-        return STUDENTS.values().stream()
-                .filter(s -> s.getMatriculationNumber().equals(matriculationNumber))
-                .findFirst();
+
+        List<Student> students = em
+                .createQuery("SELECT s FROM Student s WHERE s.matriculationNumber = :matriculationNumber",
+                        Student.class)
+                .setParameter("matriculationNumber", matriculationNumber)
+                .getResultList();
+
+        if (students.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(students.get(0));
+        }
+
     }
 
     @Transactional
@@ -69,30 +59,23 @@ public class StudentService {
         return em.merge(student);
     }
 
-    public Optional<Student> update(Long id, Student updatedStudent) {
-        if (!STUDENTS.containsKey(id)) {
-            return Optional.empty();
-        }
+    @Transactional
+    public Student update(Student updatedStudent) {
 
-        // Check if matriculation number is used by another student
-        Optional<Student> existing = findByMatriculationNumber(updatedStudent.getMatriculationNumber());
-        if (existing.isPresent() && !existing.get().getId().equals(id)) {
-            throw new IllegalArgumentException("Student with matriculation number " +
-                    updatedStudent.getMatriculationNumber() + " already exists");
-        }
+        // TODO check the id! It's not guaranteed that the id is correct.
 
-        updatedStudent.setId(id);
-        STUDENTS.put(id, updatedStudent);
-        return Optional.of(updatedStudent);
+        return em.merge(updatedStudent);
+
     }
 
+    @Transactional
     public boolean delete(Long id) {
-        return STUDENTS.remove(id) != null;
+        Student s = em.find(Student.class, id);
+        if (s == null) {
+            return false;
+        }
+        em.remove(s);
+        return true;
     }
 
-    // For testing purposes
-    public void clear() {
-        STUDENTS.clear();
-
-    }
 }

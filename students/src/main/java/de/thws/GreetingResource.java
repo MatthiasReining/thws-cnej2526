@@ -1,6 +1,5 @@
 package de.thws;
 
-import io.quarkus.Generated;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
