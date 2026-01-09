@@ -1,14 +1,14 @@
 /**
- * StudentService - Service class for handling API communication
- * Provides methods for CRUD operations on students via fetch API
+ * Service class for Student CRUD operations
+ * Handles all API communication with the backend
  */
 export class StudentService {
-    constructor(baseUrl = '/students') {
-        this.baseUrl = baseUrl;
+    constructor() {
+        this.baseUrl = '/students';
     }
 
     /**
-     * Fetch all students from the backend
+     * Get all students
      * @returns {Promise<Array>} Array of student objects
      */
     async getAllStudents() {
@@ -16,7 +16,6 @@ export class StudentService {
             const response = await fetch(this.baseUrl, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             });
@@ -33,7 +32,7 @@ export class StudentService {
     }
 
     /**
-     * Fetch a single student by ID
+     * Get a single student by ID
      * @param {number} id - Student ID
      * @returns {Promise<Object>} Student object
      */
@@ -42,7 +41,6 @@ export class StudentService {
             const response = await fetch(`${this.baseUrl}/${id}`, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             });
@@ -60,10 +58,10 @@ export class StudentService {
 
     /**
      * Create a new student
-     * @param {Object} studentData - Student data without ID
+     * @param {Object} student - Student data
      * @returns {Promise<Object>} Created student object
      */
-    async createStudent(studentData) {
+    async createStudent(student) {
         try {
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
@@ -71,7 +69,7 @@ export class StudentService {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(studentData)
+                body: JSON.stringify(student)
             });
 
             if (!response.ok) {
@@ -89,10 +87,10 @@ export class StudentService {
     /**
      * Update an existing student
      * @param {number} id - Student ID
-     * @param {Object} studentData - Updated student data
+     * @param {Object} student - Updated student data
      * @returns {Promise<Object>} Updated student object
      */
-    async updateStudent(id, studentData) {
+    async updateStudent(id, student) {
         try {
             const response = await fetch(`${this.baseUrl}/${id}`, {
                 method: 'PUT',
@@ -100,7 +98,7 @@ export class StudentService {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(studentData)
+                body: JSON.stringify(student)
             });
 
             if (!response.ok) {
@@ -133,8 +131,7 @@ export class StudentService {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // DELETE returns void, no content to parse
-            return;
+            return true;
         } catch (error) {
             console.error(`Error deleting student ${id}:`, error);
             throw error;

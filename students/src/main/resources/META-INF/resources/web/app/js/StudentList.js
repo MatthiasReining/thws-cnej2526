@@ -1,158 +1,148 @@
-import { html, render } from 'lit';
+import { LitElement, html, css } from 'https://cdn.jsdelivr.net/npm/lit@3.1.0/+esm';
 
 /**
- * StudentList - Component for displaying and managing the list of students
+ * Student List Web Component
+ * Displays a list of students with edit and delete options
  */
-export class StudentList {
-    constructor(containerId, onEdit, onDelete) {
-        this.container = document.getElementById(containerId);
+export class StudentList extends LitElement {
+    static properties = {
+        students: { type: Array },
+        loading: { type: Boolean },
+        error: { type: String }
+    };
+
+    static styles = css`
+        :host {
+            display: block;
+        }
+        
+        .student-item {
+            transition: transform 0.2s;
+        }
+        
+        .student-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .btn-group {
+            gap: 0.5rem;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+        }
+    `;
+
+    constructor() {
+        super();
         this.students = [];
-        this.onEdit = onEdit;
-        this.onDelete = onDelete;
+        this.loading = false;
+        this.error = null;
     }
 
-    /**
-     * Set students data and render
-     * @param {Array} students - Array of student objects
-     */
-    setStudents(students) {
-        this.students = students;
-        this.render();
-    }
-
-    /**
-     * Format date for display
-     * @param {string} dateString - ISO date string
-     * @returns {string} Formatted date
-     */
-    formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-
-    /**
-     * Handle edit button click
-     * @param {number} id - Student ID
-     */
-    handleEdit(id) {
-        if (this.onEdit) {
-            this.onEdit(id);
-        }
-    }
-
-    /**
-     * Handle delete button click
-     * @param {number} id - Student ID
-     * @param {string} name - Student name for confirmation
-     */
-    handleDelete(id, name) {
-        if (confirm(`Are you sure you want to delete student ${name}?`)) {
-            if (this.onDelete) {
-                this.onDelete(id);
-            }
-        }
-    }
-
-    /**
-     * Render the student list using Lit
-     */
     render() {
-        const template = html`
-            <div class="card">
-                <div class="card-body">
-                    ${this.students.length === 0 ? html`
-                        <div class="alert alert-info" role="alert">
-                            No students found. Click "Add New Student" to create one.
-                        </div>
-                    ` : html`
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                        <th>Matriculation Number</th>
-                                        <th>Enrollment Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${this.students.map(student => html`
-                                        <tr>
-                                            <td>${student.id}</td>
-                                            <td>${student.firstName}</td>
-                                            <td>${student.lastName}</td>
-                                            <td>${student.email}</td>
-                                            <td>${student.matriculationNumber}</td>
-                                            <td>${this.formatDate(student.enrollmentDate)}</td>
-                                            <td>
-                                                <button 
-                                                    class="btn btn-sm btn-primary me-1" 
-                                                    @click=${() => this.handleEdit(student.id)}
-                                                    title="Edit">
-                                                    Edit
-                                                </button>
-                                                <button 
-                                                    class="btn btn-sm btn-danger" 
-                                                    @click=${() => this.handleDelete(student.id, `${student.firstName} ${student.lastName}`)}
-                                                    title="Delete">
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    `)}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-3">
-                            <small class="text-muted">Total students: ${this.students.length}</small>
-                        </div>
-                    `}
-                </div>
-            </div>
-        `;
-
-        render(template, this.container);
-    }
-
-    /**
-     * Show loading state
-     */
-    showLoading() {
-        const template = html`
-            <div class="card">
-                <div class="card-body text-center">
+        if (this.loading) {
+            return html`
+                <div class="loading-spinner">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <p class="mt-2">Loading students...</p>
                 </div>
+            `;
+        }
+
+        if (this.error) {
+            return html`
+                <div class="alert alert-danger" role="alert">
+                    <strong>Error:</strong> ${this.error}
+                </div>
+            `;
+        }
+
+        if (this.students.length === 0) {
+            return html`
+                <div class="alert alert-info" role="alert">
+                    No students found. Add your first student!
+                </div>
+            `;
+        }
+
+        return html`
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Matriculation Number</th>
+                            <th>Enrollment Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.students.map(student => html`
+                            <tr class="student-item">
+                                <td>${student.id}</td>
+                                <td>${student.firstName}</td>
+                                <td>${student.lastName}</td>
+                                <td>${student.email}</td>
+                                <td>${student.matriculationNumber}</td>
+                                <td>${this._formatDate(student.enrollmentDate)}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button 
+                                            class="btn btn-sm btn-primary"
+                                            @click=${() => this._onEdit(student)}
+                                            title="Edit student">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </button>
+                                        <button 
+                                            class="btn btn-sm btn-danger"
+                                            @click=${() => this._onDelete(student)}
+                                            title="Delete student">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `)}
+                    </tbody>
+                </table>
             </div>
         `;
-        render(template, this.container);
     }
 
-    /**
-     * Show error message
-     * @param {string} message - Error message
-     */
-    showError(message) {
-        const template = html`
-            <div class="card">
-                <div class="card-body">
-                    <div class="alert alert-danger" role="alert">
-                        <strong>Error:</strong> ${message}
-                    </div>
-                </div>
-            </div>
-        `;
-        render(template, this.container);
+    _formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    _onEdit(student) {
+        this.dispatchEvent(new CustomEvent('edit-student', {
+            detail: { student },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    _onDelete(student) {
+        if (confirm(`Are you sure you want to delete ${student.firstName} ${student.lastName}?`)) {
+            this.dispatchEvent(new CustomEvent('delete-student', {
+                detail: { student },
+                bubbles: true,
+                composed: true
+            }));
+        }
     }
 }
+
+customElements.define('student-list', StudentList);

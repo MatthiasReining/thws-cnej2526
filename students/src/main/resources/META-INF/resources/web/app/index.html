@@ -3,173 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student Management</title>
+    <title>Student Management System</title>
+
     <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
     />
-    <!-- Lit library -->
-    <script type="importmap">
-      {
-        "imports": {
-          "lit": "https://cdn.jsdelivr.net/gh/lit/dist@3/core/lit-core.min.js",
-          "lit/": "https://cdn.jsdelivr.net/gh/lit/dist@3/"
-        }
+
+    <!-- Custom styles -->
+    <style>
+      body {
+        padding-top: 20px;
+        padding-bottom: 20px;
       }
-    </script>
+      .student-card {
+        margin-bottom: 20px;
+      }
+      .loading {
+        text-align: center;
+        padding: 40px;
+      }
+      .error-message {
+        margin: 20px 0;
+      }
+    </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Student Management System</span>
-      </div>
-    </nav>
+    <div class="container">
+      <header class="mb-4">
+        <h1 class="display-4">Student Management System</h1>
+        <p class="lead">Manage your students with ease</p>
+      </header>
 
-    <div class="container mt-4">
-      <div class="row">
-        <div class="col-md-12">
-          <h2>Students</h2>
-          <button id="btnAddStudent" class="btn btn-success mb-3">
-            <i class="bi bi-plus-circle"></i> Add New Student
-          </button>
-        </div>
-      </div>
-
-      <!-- Student List Section -->
-      <div class="row">
-        <div class="col-md-12">
-          <div id="studentListContainer"></div>
-        </div>
-      </div>
-
-      <!-- Student Form Modal -->
-      <div
-        class="modal fade"
-        id="studentModal"
-        tabindex="-1"
-        aria-labelledby="studentModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="studentModalLabel">Add Student</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <form id="studentForm">
-                <input type="hidden" id="studentId" />
-
-                <div class="mb-3">
-                  <label for="firstName" class="form-label">First Name *</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="firstName"
-                    required
-                  />
-                  <div class="invalid-feedback">First name is required.</div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="lastName" class="form-label">Last Name *</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="lastName"
-                    required
-                  />
-                  <div class="invalid-feedback">Last name is required.</div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="email" class="form-label">Email *</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    required
-                  />
-                  <div class="invalid-feedback">Valid email is required.</div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="matriculationNumber" class="form-label"
-                    >Matriculation Number *</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="matriculationNumber"
-                    DO_NOT_USE_pattern="[0-9]{7}"
-                    maxlength="7"
-                    required
-                  />
-                  <div class="invalid-feedback">
-                    Matriculation number must be 7 digits.
-                  </div>
-                  <small class="form-text text-muted">7-digit number</small>
-                </div>
-
-                <div class="mb-3">
-                  <label for="enrollmentDate" class="form-label"
-                    >Enrollment Date *</label
-                  >
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="enrollmentDate"
-                    required
-                  />
-                  <div class="invalid-feedback">
-                    Enrollment date is required.
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button type="button" class="btn btn-primary" id="btnSaveStudent">
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Alert Container -->
-      <div
-        id="alertContainer"
-        class="position-fixed top-0 end-0 p-3"
-        style="z-index: 11"
-      ></div>
+      <!-- Main App Component -->
+      <student-app></student-app>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- Lit library -->
     <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/lit@3.1.0/+esm"
     ></script>
 
-    <!-- Application JS Modules -->
-    <script type="module" src="js/StudentService.js"></script>
-    <script type="module" src="js/StudentList.js"></script>
-    <script type="module" src="js/StudentForm.js"></script>
-    <script type="module" src="js/App.js"></script>
+    <!-- App modules -->
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>

@@ -1,137 +1,239 @@
+import { LitElement, html, css } from 'https://cdn.jsdelivr.net/npm/lit@3.1.0/+esm';
 import { StudentService } from './StudentService.js';
-import { StudentList } from './StudentList.js';
-import { StudentForm } from './StudentForm.js';
+import './StudentList.js';
+import './StudentForm.js';
 
 /**
- * App - Main application class
- * Coordinates interactions between StudentService, StudentList, and StudentForm
+ * Main Application Component
+ * Manages the overall state and orchestrates student CRUD operations
  */
-class App {
-    constructor() {
-        this.studentService = new StudentService('/students');
-        this.studentList = new StudentList(
-            'studentListContainer',
-            (id) => this.handleEdit(id),
-            (id) => this.handleDelete(id)
-        );
-        this.studentForm = new StudentForm(
-            'studentForm',
-            'studentModal',
-            (isEdit, id, data) => this.handleSave(isEdit, id, data)
-        );
+export class App extends LitElement {
+    static properties = {
+        students: { type: Array },
+        loading: { type: Boolean },
+        error: { type: String },
+        showForm: { type: Boolean },
+        currentStudent: { type: Object },
+        formMode: { type: String }
+    };
 
-        this.initializeEventListeners();
+    static styles = css`
+        :host {
+            display: block;
+        }
+        
+        .app-header {
+            margin-bottom: 2rem;
+        }
+        
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        
+        .toast {
+            min-width: 300px;
+        }
+    `;
+
+    constructor() {
+        super();
+        this.studentService = new StudentService();
+        this.students = [];
+        this.loading = false;
+        this.error = null;
+        this.showForm = false;
+        this.currentStudent = null;
+        this.formMode = 'create';
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
         this.loadStudents();
     }
 
-    /**
-     * Initialize global event listeners
-     */
-    initializeEventListeners() {
-        document.getElementById('btnAddStudent').addEventListener('click', () => {
-            this.studentForm.showCreateForm();
-        });
-    }
+    render() {
+        return html`
+            <div class="app-container">
+                <div class="actions-bar">
+                    <div>
+                        <h5 class="mb-0">Students Overview</h5>
+                        <small class="text-muted">${this.students.length} student(s) total</small>
+                    </div>
+                    <div>
+                        <button 
+                            class="btn btn-success"
+                            @click=${this._handleAddNew}
+                            ?disabled=${this.loading}>
+                            <i class="bi bi-plus-circle"></i> Add New Student
+                        </button>
+                        <button 
+                            class="btn btn-secondary ms-2"
+                            @click=${this.loadStudents}
+                            ?disabled=${this.loading}>
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                </div>
 
-    /**
-     * Load all students from the backend
-     */
-    async loadStudents() {
-        try {
-            this.studentList.showLoading();
-            const students = await this.studentService.getAllStudents();
-            this.studentList.setStudents(students);
-        } catch (error) {
-            this.studentList.showError('Failed to load students. Please try again.');
-            this.showAlert('Failed to load students', 'danger');
-            console.error('Error loading students:', error);
-        }
-    }
-
-    /**
-     * Handle edit student action
-     * @param {number} id - Student ID
-     */
-    async handleEdit(id) {
-        try {
-            const student = await this.studentService.getStudentById(id);
-            this.studentForm.showEditForm(student);
-        } catch (error) {
-            this.showAlert(`Failed to load student with ID ${id}`, 'danger');
-            console.error('Error loading student:', error);
-        }
-    }
-
-    /**
-     * Handle delete student action
-     * @param {number} id - Student ID
-     */
-    async handleDelete(id) {
-        try {
-            await this.studentService.deleteStudent(id);
-            this.showAlert('Student deleted successfully', 'success');
-            await this.loadStudents();
-        } catch (error) {
-            this.showAlert('Failed to delete student', 'danger');
-            console.error('Error deleting student:', error);
-        }
-    }
-
-    /**
-     * Handle save student action (create or update)
-     * @param {boolean} isEdit - True if editing, false if creating
-     * @param {number} id - Student ID (for edit)
-     * @param {Object} data - Student data
-     */
-    async handleSave(isEdit, id, data) {
-        try {
-            if (isEdit) {
-                await this.studentService.updateStudent(id, data);
-                this.showAlert('Student updated successfully', 'success');
-            } else {
-                await this.studentService.createStudent(data);
-                this.showAlert('Student created successfully', 'success');
-            }
-            await this.loadStudents();
-        } catch (error) {
-            this.showAlert(
-                isEdit ? 'Failed to update student' : 'Failed to create student',
-                'danger'
-            );
-            console.error('Error saving student:', error);
-        }
-    }
-
-    /**
-     * Show alert message
-     * @param {string} message - Alert message
-     * @param {string} type - Alert type (success, danger, warning, info)
-     */
-    showAlert(message, type = 'info') {
-        const alertContainer = document.getElementById('alertContainer');
-        const alertId = `alert-${Date.now()}`;
-
-        const alertHtml = `
-            <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                ${this._renderToast()}
+                
+                <student-form
+                    .student=${this.currentStudent}
+                    .mode=${this.formMode}
+                    .visible=${this.showForm}
+                    @create-student=${this._handleCreate}
+                    @update-student=${this._handleUpdate}
+                    @cancel-form=${this._handleCancelForm}>
+                </student-form>
+                
+                <student-list
+                    .students=${this.students}
+                    .loading=${this.loading}
+                    .error=${this.error}
+                    @edit-student=${this._handleEdit}
+                    @delete-student=${this._handleDelete}>
+                </student-list>
             </div>
         `;
+    }
 
-        alertContainer.insertAdjacentHTML('beforeend', alertHtml);
+    _renderToast() {
+        if (!this.error) return html``;
 
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => {
-            const alertElement = document.getElementById(alertId);
-            if (alertElement) {
-                const bsAlert = new bootstrap.Alert(alertElement);
-                bsAlert.close();
+        return html`
+            <div class="toast-container">
+                <div class="toast show" role="alert">
+                    <div class="toast-header bg-danger text-white">
+                        <strong class="me-auto">Error</strong>
+                        <button type="button" class="btn-close btn-close-white" @click=${this._clearError}></button>
+                    </div>
+                    <div class="toast-body">
+                        ${this.error}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async loadStudents() {
+        this.loading = true;
+        this.error = null;
+
+        try {
+            this.students = await this.studentService.getAllStudents();
+        } catch (error) {
+            this.error = `Failed to load students: ${error.message}`;
+            console.error('Error loading students:', error);
+        } finally {
+            this.loading = false;
+        }
+    }
+
+    _handleAddNew() {
+        this.currentStudent = null;
+        this.formMode = 'create';
+        this.showForm = true;
+        this._scrollToTop();
+    }
+
+    _handleEdit(e) {
+        this.currentStudent = e.detail.student;
+        this.formMode = 'edit';
+        this.showForm = true;
+        this._scrollToTop();
+    }
+
+    async _handleCreate(e) {
+        const studentData = e.detail.student;
+        const form = this.shadowRoot.querySelector('student-form');
+
+        if (form) {
+            form.submitting = true;
+        }
+
+        try {
+            await this.studentService.createStudent(studentData);
+            await this.loadStudents();
+            this.showForm = false;
+            this._showSuccessMessage('Student created successfully!');
+        } catch (error) {
+            this.error = `Failed to create student: ${error.message}`;
+        } finally {
+            if (form) {
+                form.submitting = false;
             }
-        }, 5000);
+        }
+    }
+
+    async _handleUpdate(e) {
+        const studentData = e.detail.student;
+        const form = this.shadowRoot.querySelector('student-form');
+
+        if (form) {
+            form.submitting = true;
+        }
+
+        try {
+            await this.studentService.updateStudent(studentData.id, studentData);
+            await this.loadStudents();
+            this.showForm = false;
+            this._showSuccessMessage('Student updated successfully!');
+        } catch (error) {
+            this.error = `Failed to update student: ${error.message}`;
+        } finally {
+            if (form) {
+                form.submitting = false;
+            }
+        }
+    }
+
+    async _handleDelete(e) {
+        const student = e.detail.student;
+
+        try {
+            await this.studentService.deleteStudent(student.id);
+            await this.loadStudents();
+            this._showSuccessMessage('Student deleted successfully!');
+        } catch (error) {
+            this.error = `Failed to delete student: ${error.message}`;
+        }
+    }
+
+    _handleCancelForm() {
+        this.showForm = false;
+        this.currentStudent = null;
+    }
+
+    _clearError() {
+        this.error = null;
+    }
+
+    _showSuccessMessage(message) {
+        // You could implement a success toast similar to the error toast
+        console.log('Success:', message);
+        // For now, just clear any existing errors
+        this.error = null;
+    }
+
+    _scrollToTop() {
+        this.shadowRoot.querySelector('.app-container')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
     }
 }
 
-// Initialize the application when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    new App();
-});
+customElements.define('student-app', App);

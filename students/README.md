@@ -54,8 +54,10 @@ github Copilot Prompt:
 
 ```
 
-generate a HTML application (web site) as CRUD page for students object. There should be a list, the option to edit and delete and student and to remove a student entity.
+generate a HTML application (web site) as CRUD page for students object. There should be a list, the option to edit and delete a  student and to remove a student entity.
 The page should use lit as JS framework / library combinde with Vanilla JS (ES6+). ES6 app managed in JS classes.
+The page should be structured in Web Component (based on lit Element).
+There is no need for using DTO placeholder. Working with JSON data strcuture in JS is fine.
 The interaction should done via ES fetch to the backend JAX-RS services.
 But in general the page should work standalone. But nevertheless it should be placed in Quarkus resources\META-INF as static web resources.
 The JS App should be sepearted in HTML file, JS files (one file per class). For CSS use the latest Bootstrap CSS library (external linked).
