@@ -46,6 +46,14 @@ The Response of JAX-RS should be DTOs (objects); no Response class.
 Furthermore build suitable test cases
 ```
 
+## Package Structure
+
+Following the BCE Pattern: https://bce.design/
+
+# JAX-RS
+
+See -`Resource` classes
+
 # Frontend
 
 https://quarkus.io/guides/web#serving-static-resources
@@ -66,3 +74,26 @@ Create the folders and files directly.
 ```
 
 (Result is not so nice... prompt should be optimized...)
+
+# JPA - Jakarta Persistence API
+
+See different example for `Student`.
+
+## Infrastructure
+
+- PostgreSQL and pgadmin are managed via `docker-compose.yml`
+- Start with `docker compose up -d`
+- use http://localhost:5050 and configure pgadmin
+
+SQL Examples:
+
+- Primary Key / Sequences
+- `begin`, `rollback`, `commit`
+
+## Entity Beans
+
+Example `Student`
+
+Initilsation: `init.sql`
+
+Configuration: `application.properties`

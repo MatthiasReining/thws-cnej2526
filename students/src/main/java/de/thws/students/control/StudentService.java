@@ -1,22 +1,25 @@
 package de.thws.students.control;
 
-import de.thws.students.entity.Student;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.validation.ValidationException;
-import jakarta.ws.rs.WebApplicationException;
-
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+
+import de.thws.students.entity.Student;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class StudentService {
 
+    @PersistenceContext
+    EntityManager em;
+
     private static final Map<Long, Student> STUDENTS = new ConcurrentHashMap<>();
-    private static final AtomicLong ID_GENERATOR = new AtomicLong(1);
 
     static {
         // Initialize with 5 sample students
@@ -30,15 +33,20 @@ public class StudentService {
                 new Student(4L, "Sarah", "Weber", "sarah.weber@thws.de", "4567890", LocalDate.of(2024, 3, 15)));
         STUDENTS.put(5L,
                 new Student(5L, "Michael", "Fischer", "michael.fischer@thws.de", "5678901", LocalDate.of(2024, 10, 1)));
-        ID_GENERATOR.set(6);
+
     }
 
     public Collection<Student> findAll() {
-        return STUDENTS.values();
+
+        // JPQL -> SQL "SELECT * FROM Student s" -> JPQL Select s from Student s
+        List<Student> students = em.createQuery("SELECT s FROM Student s", Student.class)
+                .getResultList();
+
+        return students;
     }
 
     public Optional<Student> findById(Long id) {
-        return Optional.ofNullable(STUDENTS.get(id));
+        return Optional.ofNullable(em.find(Student.class, id));
     }
 
     public Optional<Student> findByMatriculationNumber(String matriculationNumber) {
@@ -47,15 +55,18 @@ public class StudentService {
                 .findFirst();
     }
 
+    @Transactional
     public Student create(Student student) {
-        if (findByMatriculationNumber(student.getMatriculationNumber()).isPresent()) {
-            throw new WebApplicationException("Student with matriculation number " +
-                    student.getMatriculationNumber() + " already exists");
-        }
-        Long id = ID_GENERATOR.getAndIncrement();
-        student.setId(id);
-        STUDENTS.put(id, student);
-        return student;
+
+        // Ipmlemnt as DB contraint or as business logic in Java ???
+        // skipped here
+        // if (findByMatriculationNumber(student.getMatriculationNumber()).isPresent())
+        // {
+        // throw new WebApplicationException("Student with matriculation number " +
+        // student.getMatriculationNumber() + " already exists");
+        // }
+
+        return em.merge(student);
     }
 
     public Optional<Student> update(Long id, Student updatedStudent) {
@@ -82,6 +93,6 @@ public class StudentService {
     // For testing purposes
     public void clear() {
         STUDENTS.clear();
-        ID_GENERATOR.set(1);
+
     }
 }
