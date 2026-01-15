@@ -8,8 +8,10 @@ import de.thws.courses.entity.Course;
 import de.thws.courses.entity.CourseParticipant;
 import de.thws.log.control.LogService;
 import de.thws.students.boundary.dto.CreateCourseParticiapantDTO;
+import de.thws.students.boundary.dto.StudentDTO;
 import de.thws.students.entity.Student;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -23,6 +25,9 @@ public class StudentService {
 
     @Inject
     LogService logService;
+
+    @Inject
+    Event<StudentDTO> studentCreatedEvent;
 
     public Collection<Student> findAll() {
 
@@ -61,7 +66,19 @@ public class StudentService {
         // student.getMatriculationNumber() + " already exists");
         // }
 
-        return em.merge(student);
+        var s = em.merge(student);
+
+        var dto = new StudentDTO(
+                student.getId(),
+                student.getFirstName(),
+                student.getLastName(),
+                student.getEmail(),
+                student.getMatriculationNumber(),
+                student.getEnrollmentDate());
+
+        studentCreatedEvent.fireAsync(dto);
+
+        return s;
     }
 
     // REQREUIED - default behaviour
