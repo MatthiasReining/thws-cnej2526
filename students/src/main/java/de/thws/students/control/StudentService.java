@@ -12,6 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
 public class StudentService {
@@ -86,9 +87,19 @@ public class StudentService {
 
         Student student = em.find(Student.class, studentId);
 
-        System.out.println()
+        if (student == null) {
+            // Example for built-in exception with ExceptionMapper (see
+            // IllegalArgumentExceptionMapper)
+            throw new IllegalArgumentException("Student with id " + studentId + " not found");
+        }
+
         CourseParticipant cp = new CourseParticipant();
         Course course = em.find(Course.class, courseParticiapantDTO.courseId());
+        if (course == null) {
+            // Example for custom exception
+            throw new CourseNotFoundException(
+                    "Course with id " + courseParticiapantDTO.courseId() + " not found");
+        }
 
         cp.course = course;
         cp.grade = courseParticiapantDTO.grade();
