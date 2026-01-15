@@ -1,7 +1,9 @@
 package de.thws.log.control;
 
+import de.thws.chat.boundary.LogMessage;
 import de.thws.log.entity.LogData;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.ObservesAsync;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
@@ -16,5 +18,10 @@ public class LogService {
 
         // Exception is thrown to simulate failure
         System.out.println("Fehler: " + 42 / 0);
+    }
+
+    public void chatNews(@ObservesAsync @LogMessage String message) {
+        System.out.println("Logging chat message: " + message);
+        // FIXME log("Chat message sent: " + message);
     }
 }
