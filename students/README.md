@@ -136,7 +136,7 @@ See different examples for `Student`.
 
 ---
 
-## Infrastructure
+### Infrastructure
 
 - PostgreSQL and pgAdmin are managed via `docker-compose.yml`
 - Start infrastructure:
@@ -158,7 +158,7 @@ SQL examples (via pgAdmin):
 
 ---
 
-## Entity Beans
+### Entity Beans
 
 Example: `Student`
 
@@ -167,7 +167,7 @@ Example: `Student`
 
 ---
 
-## JPA Examples
+### JPA Examples
 
 Entities:
 
@@ -212,7 +212,7 @@ WHERE cp.course_id = 1;
 
 ---
 
-## Advanced Example: Panache
+### Advanced Example: Panache
 
 See `LogData.java`.
 
