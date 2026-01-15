@@ -6,9 +6,11 @@ import java.util.Optional;
 
 import de.thws.courses.entity.Course;
 import de.thws.courses.entity.CourseParticipant;
+import de.thws.log.control.LogService;
 import de.thws.students.boundary.dto.CreateCourseParticiapantDTO;
 import de.thws.students.entity.Student;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,9 @@ public class StudentService {
 
     @PersistenceContext
     EntityManager em;
+
+    @Inject
+    LogService logService;
 
     public Collection<Student> findAll() {
 
@@ -57,6 +62,26 @@ public class StudentService {
         // }
 
         return em.merge(student);
+    }
+
+    // REQREUIED - default behaviour
+    @Transactional(Transactional.TxType.REQUIRED)
+    public Student createTxExample(Student student) {
+
+        Student s = em.merge(student);
+
+        try {
+
+            logService.log("Student " + student.getFirstName() + " created");
+        } catch (Exception e) {
+            // exception from logService.log is thrown and managed here
+            System.out.println("Logging failed: " + e.getMessage());
+            // ignore log exeption problems
+        }
+
+        // Student is created within this transaciont (REQUIRED)
+        // Log Entity Tx is rolled back due to exception in LogService (REQUIRES_NEW)
+        return s;
     }
 
     @Transactional

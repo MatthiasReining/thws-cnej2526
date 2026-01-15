@@ -91,6 +91,14 @@ public class StudentsResource {
         return toDTO(created);
     }
 
+    @Path("/tx-example")
+    @POST
+    public StudentDTO createStudentTxExample(@Valid CreateStudentDTO createDTO) {
+        Student student = fromCreateDTO(createDTO);
+        Student created = studentService.createTxExample(student);
+        return toDTO(created);
+    }
+
     @PUT
     @Path("/{id}")
     public StudentDTO updateStudent(@PathParam("id") Long id, @Valid UpdateStudentDTO updateDTO) {
