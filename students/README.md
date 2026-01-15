@@ -97,3 +97,16 @@ Example `Student`
 Initilsation: `init.sql`
 
 Configuration: `application.properties`
+
+## JPA Examples
+
+Course / Student / CourseParticipant
+
+SQL Join:
+
+```sql
+select * from student s
+ JOIN courseparticipant cp ON s.id = cp.student_id
+ JOIN course c ON c.id = cp.course_id
+where cp.course_id = 1
+```

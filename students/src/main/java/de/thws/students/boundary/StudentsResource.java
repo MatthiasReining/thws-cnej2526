@@ -2,6 +2,10 @@ package de.thws.students.boundary;
 
 import java.util.List;
 
+import de.thws.students.boundary.dto.CreateCourseParticiapantDTO;
+import de.thws.students.boundary.dto.CreateStudentDTO;
+import de.thws.students.boundary.dto.StudentDTO;
+import de.thws.students.boundary.dto.UpdateStudentDTO;
 import de.thws.students.control.StudentService;
 import de.thws.students.entity.Student;
 import jakarta.inject.Inject;
@@ -36,7 +40,7 @@ public class StudentsResource {
 
     @POST
     @Path("/{id}/courses")
-    public void addCourse(@PathParam("id") Long id, @Valid CourseParticiapantDTO courseParticiapantDTO) {
+    public void addCourse(@PathParam("id") Long id, @Valid CreateCourseParticiapantDTO courseParticiapantDTO) {
 
         System.out.println("Adding course participant to student with id: " + id);
         studentService.addCourseParticipation(id, courseParticiapantDTO);

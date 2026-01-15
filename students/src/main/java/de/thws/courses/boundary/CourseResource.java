@@ -1,10 +1,13 @@
 package de.thws.courses.boundary;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import de.thws.courses.boundary.dto.CourseDTO;
+import de.thws.courses.boundary.dto.CourseParticiapantDTO;
 import de.thws.courses.entity.Course;
 import de.thws.courses.entity.CourseParticipant;
-import de.thws.students.boundary.StudentDTO;
+import de.thws.students.entity.Student;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.ws.rs.GET;
@@ -29,13 +32,26 @@ public class CourseResource {
 
     @GET
     @Path("/{courseId}/students")
-    public List<CourseParticipant> getAllStudentsByCourses(@PathParam("courseId") Long courseId) {
+    public List<CourseParticiapantDTO> getAllStudentsByCourses(@PathParam("courseId") Long courseId) {
 
-        Course course = em.find(Course.class, courseId);
+        List<CourseParticipant> cps = em
+                .createQuery("SELECT cp FROM CourseParticipant cp WHERE cp.course.id = :courseId",
+                        CourseParticipant.class)
+                .setParameter("courseId", courseId)
+                .getResultList();
 
-        var courseParticipants = course.courseParticipants;
+        List<CourseParticiapantDTO> result = new ArrayList<>();
+        for (CourseParticipant cp : cps) {
 
-        return courseParticipants;
+            // every iteration is a dedicated select -> optimize statentment! (see
+            // README.md)
+            Student s = cp.student;
+            var courseParticipantDTO = new CourseParticiapantDTO(s.getId(),
+                    s.getFirstName(), s.getLastName(), s.getEmail(), s.getMatriculationNumber(), cp.grade);
+            result.add(courseParticipantDTO);
+        }
+
+        return result;
     }
 
 }

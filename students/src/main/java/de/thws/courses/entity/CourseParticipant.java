@@ -1,5 +1,6 @@
 package de.thws.courses.entity;
 
+import de.thws.students.entity.Student;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -16,4 +17,7 @@ public class CourseParticipant {
 
     @ManyToOne
     public Course course;
+
+    @ManyToOne
+    public Student student;
 }
