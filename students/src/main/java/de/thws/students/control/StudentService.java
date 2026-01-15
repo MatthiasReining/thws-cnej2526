@@ -12,7 +12,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
 public class StudentService {
@@ -22,9 +21,7 @@ public class StudentService {
 
     public Collection<Student> findAll() {
 
-        // JPQL -> SQL "SELECT * FROM Student s" -> JPQL Select s from Student s
-        List<Student> students = em.createQuery("SELECT x FROM Student x", Student.class)
-                .getResultList();
+        List<Student> students = em.createNamedQuery(Student.FIND_ALL, Student.class).getResultList();
 
         return students;
     }
@@ -36,9 +33,8 @@ public class StudentService {
     public Optional<Student> findByMatriculationNumber(String matriculationNumber) {
 
         List<Student> students = em
-                .createQuery("SELECT s FROM Student s WHERE s.matriculationNumber = :matriculationNumber",
-                        Student.class)
-                .setParameter("matriculationNumber", matriculationNumber)
+                .createNamedQuery(Student.FIND_BY_MATRICULATION_NUMBER, Student.class)
+                .setParameter(Student.PARAM_MATRICULATION_NUMBER, matriculationNumber)
                 .getResultList();
 
         if (students.isEmpty()) {

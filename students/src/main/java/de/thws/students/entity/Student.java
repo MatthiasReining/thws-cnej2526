@@ -10,10 +10,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 
+@NamedQueries({
+        @NamedQuery(name = Student.FIND_ALL, query = "SELECT s FROM Student s"),
+        @NamedQuery(name = Student.FIND_BY_MATRICULATION_NUMBER, query = "SELECT s FROM Student s WHERE s.matriculationNumber = :"
+                + Student.PARAM_MATRICULATION_NUMBER)
+})
 @Entity
 public class Student {
+
+    public static final String FIND_ALL = "Student.findAll";
+    public static final String FIND_BY_MATRICULATION_NUMBER = "Student.findByMatriculationNumber";
+    public static final String PARAM_MATRICULATION_NUMBER = "matriculationNumber";
 
     @Id
     @GeneratedValue
