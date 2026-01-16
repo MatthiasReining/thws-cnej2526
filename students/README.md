@@ -31,7 +31,11 @@ docker build -f src/main/docker/Dockerfile.jvm -t thws/students-jvm .
 docker run -i --rm -p 8080:8080 thws/students-jvm
 ```
 
----
+Start docker and use psql also within docker on HOST machine:
+
+docker run -i --rm -p - QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://host.docker.internal:5432/mydb 8080:8080 thws/students-jvm
+
+## HOST IP = host.docker.internal
 
 ### Build Docker (Native)
 
@@ -225,3 +229,13 @@ Here, entity beans **extend `PanacheEntity`**, which provides:
 Reference:
 
 - https://quarkus.io/guides/hibernate-orm-panache
+
+# Micro Profile
+
+## Config
+
+Example call with docker:
+
+docker run -i --rm -e QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://host.docker.internal:5432/mydb -e THWS_LOGGER=SPECIAL -p 8080:8080 thws/students-jvm
+
+use environment vairalbe THWS_LOGGER...
