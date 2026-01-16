@@ -20,8 +20,17 @@ public class LogService {
         System.out.println("Fehler: " + 42 / 0);
     }
 
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    public void logCorrect(String message) {
+
+        LogData logData = new LogData();
+        logData.message = message;
+        logData.persist();
+
+    }
+
     public void chatNews(@ObservesAsync @LogMessage String message) {
         System.out.println("Logging chat message: " + message);
-        // FIXME log("Chat message sent: " + message);
+        logCorrect("Chat message sent: " + message);
     }
 }
