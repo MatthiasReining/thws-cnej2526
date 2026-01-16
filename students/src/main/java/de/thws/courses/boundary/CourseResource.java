@@ -1,13 +1,22 @@
 package de.thws.courses.boundary;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.thws.courses.boundary.dto.CourseDTO;
 import de.thws.courses.boundary.dto.CourseParticiapantDTO;
+import de.thws.courses.control.GradeCalculator;
 import de.thws.courses.entity.Course;
 import de.thws.courses.entity.CourseParticipant;
 import de.thws.students.entity.Student;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.ws.rs.GET;
@@ -19,6 +28,9 @@ public class CourseResource {
 
     @PersistenceContext
     EntityManager em;
+
+    @Inject
+    GradeCalculator gradeCalculator;
 
     @GET
     public List<CourseDTO> getAllCourses() {
@@ -52,6 +64,13 @@ public class CourseResource {
         }
 
         return result;
+    }
+
+    @GET
+    @Path("/{courseId}/grades")
+    public String gradeCalculation(@PathParam("courseId") Long courseId) {
+
+        return String.valueOf(gradeCalculator.calculateGrade());
     }
 
 }
